@@ -1,57 +1,25 @@
+<!-- page2.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Cookie Test</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #output {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background: #f9f9f9;
-      width: 300px;
-      min-height: 40px;
-    }
-    button {
-      margin: 5px;
-    }
-  </style>
+  <title>Page 2 - Receive Data</title>
 </head>
 <body>
-  <h1>Cookie Test</h1>
-
-  <button onclick="setCookie('testCookie', 'HelloWorld', 1)">Set Cookie</button>
-  <button onclick="displayMessage(getCookie('testCookie'))">Get Cookie</button>
-  <button onclick="deleteCookie('testCookie')">Delete Cookie</button>
-
-  <div id="output">Messages will appear here...</div>
+  <h2>Page 2 - Received Data</h2>
+  <div id="output"></div>
 
   <script>
-    function displayMessage(message) {
-      document.getElementById('output').textContent = message;
-    }
+    // Parse URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId");
+    const token = params.get("token");
 
-    function setCookie(name, value, days) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-      displayMessage('Cookie set: ' + name + '=' + value);
-    }
-
-    function getCookie(name) {
-      const cookies = document.cookie.split('; ').reduce((acc, cookieStr) => {
-        const [key, val] = cookieStr.split('=');
-        acc[key] = val;
-        return acc;
-      }, {});
-      return cookies[name] || 'Cookie not found';
-    }
-
-    function deleteCookie(name) {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      displayMessage('Cookie deleted: ' + name);
-    }
+    // Display result
+    document.getElementById("output").innerHTML = `
+      <p><strong>User ID:</strong> ${userId}</p>
+      <p><strong>Token:</strong> ${token}</p>
+    `;
   </script>
 </body>
 </html>
-
