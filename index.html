@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cookie Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      width: 300px;
+      min-height: 40px;
+    }
+    button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cookie Test</h1>
+
+  <button onclick="setCookie('testCookie', 'HelloWorld', 1)">Set Cookie</button>
+  <button onclick="displayMessage(getCookie('testCookie'))">Get Cookie</button>
+  <button onclick="deleteCookie('testCookie')">Delete Cookie</button>
+
+  <div id="output">Messages will appear here...</div>
+
+  <script>
+    function displayMessage(message) {
+      document.getElementById('output').textContent = message;
+    }
+
+    function setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+      displayMessage('Cookie set: ' + name + '=' + value);
+    }
+
+    function getCookie(name) {
+      const cookies = document.cookie.split('; ').reduce((acc, cookieStr) => {
+        const [key, val] = cookieStr.split('=');
+        acc[key] = val;
+        return acc;
+      }, {});
+      return cookies[name] || 'Cookie not found';
+    }
+
+    function deleteCookie(name) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      displayMessage('Cookie deleted: ' + name);
+    }
+  </script>
+</body>
+</html>
+
