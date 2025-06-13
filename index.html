@@ -43,26 +43,6 @@
     } else {
       document.getElementById("status").innerText = "🔐 No session. Requesting from GAS...";
 alert("111")
-      // Load iframe to request session from GAS
-      const iframe = document.createElement("iframe");
-      iframe.src = `${GAS_URL}?page=UserAccessControl`;
-      iframe.style.display = "none";
-      document.body.appendChild(iframe);
-
-      // Listen for postMessage from GAS iframe
-      window.addEventListener("message", function(event) {
-        // Optional: verify origin if known
-        // if (!event.origin.includes("script.google.com")) return;
-
-        const { userId, token } = event.data || {};
-        if (userId && token) {
-          setCookie("userId", userId);
-          setCookie("token", token);
-          redirectToISMPage(userId, token);
-        } else {
-          document.getElementById("status").innerText = "❌ Failed to get session.";
-        }
-      }, false);
     }
   </script>
 </body>
