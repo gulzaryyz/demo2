@@ -1,20 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GitHub Login Bridge</title>
   <meta charset="UTF-8">
+  <title>GitHub Param & Cookie Check</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .info {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #333;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h2>🔐 Checking login session...</h2>
-  <div id="status">⏳ Checking for existing session...</div>
-  <button onclick="showCookies()">🧪 Check Cookies</button>
+  <div class="box">
+    <h2>🔍 Session Check</h2>
+    <div id="output" class="info">Checking for parameters and cookies...</div>
+  </div>
 
   <script>
-    // === Config ===
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyIrRux_SfzQlA0UHxjFc5G-Plx1M8Yle1rkYkR51tkykkIGEdRfYe5llk6EiUjvKl8/exec";
-    const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
+    // Get URL parameters
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
 
-    // === Helper Functions ===
+    // Get cookie
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -22,53 +50,40 @@
       return null;
     }
 
+    // Set cookie
     function setCookie(name, value, days = 30) {
       const expires = new Date(Date.now() + days * 864e5).toUTCString();
       document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
     }
 
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
+    const userIdParam = getParam("userId");
+    const tokenParam = getParam("token");
+    const output = document.getElementById("output");
 
-    function redirectToISMPage(userId, token) {
-      const finalURL = `${ISM_REDIRECT_URL}&userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
-      document.getElementById("status").innerText = "✅ Redirecting to secure page...";
-      window.location.href = finalURL;
-    }
+    if (userIdParam && tokenParam) {
+      // Save to cookies
+      setCookie("userId", userIdParam);
+      setCookie("token", tokenParam);
 
-    // === Show Cookies Button Function ===
-    function showCookies() {
-      const uid = getCookie("userId");
-      const tok = getCookie("token");
-      alert(`🧪 userId: ${uid || "(not found)"}\ntoken: ${tok || "(not found)"}`);
-    }
-
-    // === Main Logic ===
-    let userId = getCookie("userId");
-    let token = getCookie("token");
-
-    if (!userId || !token) {
-      const urlUserId = getQueryParam("userId");
-      const urlToken = getQueryParam("token");
-
-      if (urlUserId && urlToken) {
-        setCookie("userId", urlUserId);
-        setCookie("token", urlToken);
-        userId = urlUserId;
-        token = urlToken;
-      }
-    }
-
-    if (userId && token) {
-      alert(222)
-      document.getElementById("status").innerText = "✅ Session found. Redirecting...";
-      redirectToISMPage(userId, token);
+      output.innerHTML = `
+        ✅ <strong>userId (from URL):</strong> ${userIdParam}<br>
+        ✅ <strong>token (from URL):</strong> ${tokenParam}<br>
+        💾 Saved to cookies.
+      `;
     } else {
-      alert(1111)
-      document.getElementById("status").textContent = "🔁 Redirecting to GAS for session creation...";
-      window.location.href = GAS_URL;
+      // Check cookies
+      const userIdCookie = getCookie("userId");
+      const tokenCookie = getCookie("token");
+
+      if (userIdCookie && tokenCookie) {
+        output.innerHTML = `
+          ✅ <strong>userId (from cookie):</strong> ${userIdCookie}<br>
+          ✅ <strong>token (from cookie):</strong> ${tokenCookie}<br>
+          🔄 No URL parameters found; using saved session.
+        `;
+      } else {
+        output.innerHTML = `<span class="error">❌ No session info found in URL or cookies.</span>`;
+      }
     }
   </script>
 </body>
