@@ -27,12 +27,26 @@
       font-weight: bold;
       margin-top: 20px;
     }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      background-color: #f44336;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d32f2f;
+    }
   </style>
 </head>
 <body>
   <div class="box">
     <h2>🔍 Session Check</h2>
     <div id="output" class="info">Checking for parameters and cookies...</div>
+    <button onclick="deleteCookies()">🗑️ Delete Cookies</button>
   </div>
 
   <script>
@@ -56,22 +70,30 @@
       document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
     }
 
+    // Delete cookie
+    function deleteCookie(name) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    }
+
+    function deleteCookies() {
+      deleteCookie("userId");
+      deleteCookie("token");
+      document.getElementById("output").innerHTML = "❌ Cookies deleted. Refresh to check again.";
+    }
+
     const userIdParam = getParam("userId");
     const tokenParam = getParam("token");
     const output = document.getElementById("output");
 
     if (userIdParam && tokenParam) {
-      // Save to cookies
       setCookie("userId", userIdParam);
       setCookie("token", tokenParam);
-
       output.innerHTML = `
         ✅ <strong>userId (from URL):</strong> ${userIdParam}<br>
         ✅ <strong>token (from URL):</strong> ${tokenParam}<br>
         💾 Saved to cookies.
       `;
     } else {
-      // Check cookies
       const userIdCookie = getCookie("userId");
       const tokenCookie = getCookie("token");
 
