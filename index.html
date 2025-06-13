@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GitHub Cookie Bridge</title>
+  <title>GitHub Login Bridge</title>
+  <meta charset="UTF-8">
 </head>
 <body>
-  <h2>Loading authentication...</h2>
+  <h2>🔐 Checking login session...</h2>
+  <div id="status">⏳ Checking for existing session...</div>
 
   <script>
-    // --- Helper functions ---
+    // === Config ===
+    const GAS_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+    const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
+
+    // === Helper functions ===
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -21,33 +27,41 @@
     }
 
     function redirectToISMPage(userId, token) {
-      const gasURL = "https://script.google.com/macros/s/AKfycbXXXXXX/exec";
-      const redirectURL = `${gasURL}?userId=${userId}&token=${token}`;
-      window.location.href = redirectURL;
+      const finalURL = `${ISM_REDIRECT_URL}&userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
+      document.getElementById("status").innerText = "✅ Redirecting to secure page...";
+      window.location.href = finalURL;
     }
 
-    // --- Main logic ---
+    // === Main Logic ===
     const userId = getCookie("userId");
     const token = getCookie("token");
 
     if (userId && token) {
-      console.log("✅ Cookies found, redirecting...");
+      document.getElementById("status").innerText = "✅ Session found. Redirecting...";
       redirectToISMPage(userId, token);
     } else {
-      console.log("🔒 Cookies missing. Loading fallback...");
+      document.getElementById("status").innerText = "🔐 No session. Requesting from GAS...";
+
+      // Load iframe to request session from GAS
       const iframe = document.createElement("iframe");
-      iframe.src = "https://script.google.com/macros/s/AKfycbXXXXXX/exec?page=UserAccessControl";
+      iframe.src = `${GAS_URL}?page=UserAccessControl`;
       iframe.style.display = "none";
       document.body.appendChild(iframe);
 
-      window.addEventListener("message", (event) => {
-        if (event.origin.includes("script.google.com") && event.data?.userId && event.data?.token) {
-          console.log("✅ Received credentials from GAS:", event.data);
-          setCookie("userId", event.data.userId);
-          setCookie("token", event.data.token);
-          redirectToISMPage(event.data.userId, event.data.token);
+      // Listen for postMessage from GAS iframe
+      window.addEventListener("message", function(event) {
+        // Optional: verify origin if known
+        // if (!event.origin.includes("script.google.com")) return;
+
+        const { userId, token } = event.data || {};
+        if (userId && token) {
+          setCookie("userId", userId);
+          setCookie("token", token);
+          redirectToISMPage(userId, token);
+        } else {
+          document.getElementById("status").innerText = "❌ Failed to get session.";
         }
-      });
+      }, false);
     }
   </script>
 </body>
