@@ -10,7 +10,7 @@
 
   <script>
     // === Config ===
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxreJeaBJpGY18hKfsOjOpGePfmoGjZuVsTXl0ehCtmnjWlXyA2GdrZadJw_5S3F7fK/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyIrRux_SfzQlA0UHxjFc5G-Plx1M8Yle1rkYkR51tkykkIGEdRfYe5llk6EiUjvKl8/exec";
     
   //  const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
 
@@ -41,12 +41,12 @@
       document.getElementById("status").innerText = "✅ Session found. Redirecting...";
       redirectToISMPage(userId, token);
     } else {
-alert("222")
+alert("333")
     //  document.getElementById("status").innerText = "🔐 No session. Requesting from GAS...";
       document.getElementById("status").textContent = "🔁 Redirecting to GAS for session creation...";
-    //    window.location.href = GAS_USER_PAGE + `&redirect=https://yourusername.github.io/yourrepo/index.html`;
+        window.location.href = GAS_USER_PAGE;
 
-    window.location.href = "https://www.example.com/new-page";
+    //window.location.href = "https://www.example.com/new-page";
       
     }
   </script>
