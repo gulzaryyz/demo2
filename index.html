@@ -7,14 +7,14 @@
 <body>
   <h2>🔐 Checking login session...</h2>
   <div id="status">⏳ Checking for existing session...</div>
+  <button onclick="showCookies()">🧪 Check Cookies</button>
 
   <script>
     // === Config ===
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyIrRux_SfzQlA0UHxjFc5G-Plx1M8Yle1rkYkR51tkykkIGEdRfYe5llk6EiUjvKl8/exec";
-    
-  //  const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
+    const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
 
-    // === Helper functions ===
+    // === Helper Functions ===
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -27,27 +27,46 @@
       document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
     }
 
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
     function redirectToISMPage(userId, token) {
       const finalURL = `${ISM_REDIRECT_URL}&userId=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
       document.getElementById("status").innerText = "✅ Redirecting to secure page...";
       window.location.href = finalURL;
     }
 
+    // === Show Cookies Button Function ===
+    function showCookies() {
+      const uid = getCookie("userId");
+      const tok = getCookie("token");
+      alert(`🧪 userId: ${uid || "(not found)"}\ntoken: ${tok || "(not found)"}`);
+    }
+
     // === Main Logic ===
-    const userId = getCookie("userId");
-    const token = getCookie("token");
+    let userId = getCookie("userId");
+    let token = getCookie("token");
+
+    if (!userId || !token) {
+      const urlUserId = getQueryParam("userId");
+      const urlToken = getQueryParam("token");
+
+      if (urlUserId && urlToken) {
+        setCookie("userId", urlUserId);
+        setCookie("token", urlToken);
+        userId = urlUserId;
+        token = urlToken;
+      }
+    }
 
     if (userId && token) {
       document.getElementById("status").innerText = "✅ Session found. Redirecting...";
       redirectToISMPage(userId, token);
     } else {
-alert("33")
-    //  document.getElementById("status").innerText = "🔐 No session. Requesting from GAS...";
       document.getElementById("status").textContent = "🔁 Redirecting to GAS for session creation...";
-        window.location.href = GAS_URL;
-
-    //window.location.href = "https://www.example.com/new-page";
-      
+      window.location.href = GAS_URL;
     }
   </script>
 </body>
