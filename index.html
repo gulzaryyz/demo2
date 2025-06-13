@@ -1,25 +1,54 @@
-<!-- page2.html -->
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Page 2 - Receive Data</title>
+  <title>GitHub Cookie Bridge</title>
 </head>
 <body>
-  <h2>Page 2 - Received Data</h2>
-  <div id="output"></div>
+  <h2>Loading authentication...</h2>
 
   <script>
-    // Parse URL parameters
-    const params = new URLSearchParams(window.location.search);
-    const userId = params.get("userId");
-    const token = params.get("token");
+    // --- Helper functions ---
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return decodeURIComponent(parts.pop().split(";").shift());
+      return null;
+    }
 
-    // Display result
-    document.getElementById("output").innerHTML = `
-      <p><strong>User ID:</strong> ${userId}</p>
-      <p><strong>Token:</strong> ${token}</p>
-    `;
+    function setCookie(name, value, days = 30) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+    }
+
+    function redirectToISMPage(userId, token) {
+      const gasURL = "https://script.google.com/macros/s/AKfycbXXXXXX/exec";
+      const redirectURL = `${gasURL}?userId=${userId}&token=${token}`;
+      window.location.href = redirectURL;
+    }
+
+    // --- Main logic ---
+    const userId = getCookie("userId");
+    const token = getCookie("token");
+
+    if (userId && token) {
+      console.log("✅ Cookies found, redirecting...");
+      redirectToISMPage(userId, token);
+    } else {
+      console.log("🔒 Cookies missing. Loading fallback...");
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://script.google.com/macros/s/AKfycbXXXXXX/exec?page=UserAccessControl";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      window.addEventListener("message", (event) => {
+        if (event.origin.includes("script.google.com") && event.data?.userId && event.data?.token) {
+          console.log("✅ Received credentials from GAS:", event.data);
+          setCookie("userId", event.data.userId);
+          setCookie("token", event.data.token);
+          redirectToISMPage(event.data.userId, event.data.token);
+        }
+      });
+    }
   </script>
 </body>
 </html>
