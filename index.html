@@ -12,7 +12,7 @@
     // === Config ===
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxreJeaBJpGY18hKfsOjOpGePfmoGjZuVsTXl0ehCtmnjWlXyA2GdrZadJw_5S3F7fK/exec";
     
-    const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
+  //  const ISM_REDIRECT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?page=ism-e-azam";
 
     // === Helper functions ===
     function getCookie(name) {
@@ -42,7 +42,7 @@
       redirectToISMPage(userId, token);
     } else {
       document.getElementById("status").innerText = "🔐 No session. Requesting from GAS...";
-
+alert("111")
       // Load iframe to request session from GAS
       const iframe = document.createElement("iframe");
       iframe.src = `${GAS_URL}?page=UserAccessControl`;
