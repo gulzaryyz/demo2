@@ -62,9 +62,11 @@
     }
 
     if (userId && token) {
+      alert(222)
       document.getElementById("status").innerText = "✅ Session found. Redirecting...";
       redirectToISMPage(userId, token);
     } else {
+      alert(1111)
       document.getElementById("status").textContent = "🔁 Redirecting to GAS for session creation...";
       window.location.href = GAS_URL;
     }
